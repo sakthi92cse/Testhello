@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs
+  namespace: test-ns
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5   
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1      
+      maxSurge: 1           
+  selector:
+    matchLabels:
+      app: nodejs
+  template:
+    metadata:
+      labels:
+        app: nodejs
+    spec:
+      containers:
+      - name: nodejs
+        image: sivavel/hellow:latest
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 1
+            memory: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodejssvc
+  namespace: test-ns
+spec:
+  type: LoadBalancer
+  selector:
+    app: nodejs
+  ports:
+  - port: 8080
+    targetPort: 3000
+
+
+
